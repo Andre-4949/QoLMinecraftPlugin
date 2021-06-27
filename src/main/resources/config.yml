@@ -1,0 +1,10 @@
+simpleHarvest:
+  materials:
+    - BEETROOTS
+    - WHEAT
+    - CARROTS
+    - POTATOES
+advancedCompost:
+  materials:
+    - ROTTEN_FLESH
+    - COPPER_ORE

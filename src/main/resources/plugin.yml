@@ -1,0 +1,8 @@
+  name: QoLPlugin
+  main: de.andre.QoLPlugin.Main
+  version: 0.01-ALPHA
+  api-version: 1.17
+  author: Andre-4949
+  commands:
+    qol:
+      description: reloads the config
