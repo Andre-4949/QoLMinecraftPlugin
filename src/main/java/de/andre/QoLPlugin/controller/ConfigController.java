@@ -56,7 +56,6 @@ public class ConfigController {
     private void loadAdvancedCompostMaterials(YamlConfiguration config) {
         if (config.contains("advancedCompost.materials")) {
             this.advancedCompostMaterials = config.getStringList("advancedCompost.materials").stream().map(x->Material.getMaterial(x.toUpperCase())).collect(Collectors.toList());
-            Util.sendInfoLogMessage(this.controller,advancedCompostMaterials.toString());
         }
     }
 
@@ -99,10 +98,6 @@ public class ConfigController {
 
     public List<Material> getSimpleHarvestMaterials() {
         return simpleHarvestMaterials;
-    }
-
-    public YamlConfiguration getConfig() {
-        return YamlConfiguration.loadConfiguration(config);
     }
 
     public MessageController getMessages() {

@@ -12,6 +12,6 @@ public class Util {
     }
 
     public static void sendInfoLogMessage(PluginController controller, Object o){
-        Bukkit.getLogger().info(controller.getConfig().getMessages().getServerPrefix()+o.toString());
+        Bukkit.getLogger().info(controller.getConfig().getMessages().getSERVERPREFIX()+o.toString());
     }
 }
