@@ -6,7 +6,6 @@ public class PluginController {
     private final Main main;
     private ConfigController config;
     private ListenerController listenerController;
-
     public PluginController(Main main) {
         this.main = main;
     }
@@ -25,5 +24,6 @@ public class PluginController {
 
     public void setConfig(ConfigController config){
         this.config = config;
+        config.onEnable();
     }
 }

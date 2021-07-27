@@ -9,6 +9,8 @@ import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -87,6 +89,39 @@ public class FarmingListener implements QoLListener {
                 playerMainHand.setAmount(playerMainHand.getAmount() % 8);
                 p.getInventory().setItemInMainHand(playerMainHand);
             }
+        }
+    }
+
+    @EventHandler
+    public void onHopperEvent(InventoryMoveItemEvent event) {
+        if (!event.getDestination().getType().equals(InventoryType.COMPOSTER) ||
+                !event.getSource().getType().equals(InventoryType.HOPPER) ||
+                (event.getDestination().getLocation() != null &&
+                        event.getSource().getLocation() != null) ||
+                !controller.getConfig().getAdvancedCompostMaterials().contains(event.getItem().getType())
+        ) return;
+
+        Block destination = Objects.requireNonNull(event.getSource().getLocation()).add(0.0, -1.0, 0.0).getBlock();
+        Levelled composter = (Levelled) destination.getBlockData();
+
+        if (composter.getLevel() == composter.getMaximumLevel()) event.setCancelled(true);
+
+        try {
+
+            composter.setLevel(composter.getLevel() + 1);
+            destination.setBlockData(composter, true);
+
+            ItemStack removeItem = event.getItem();
+            removeItem.setAmount(1);
+
+            for (ItemStack itemStack : event.getSource()) {
+                if (itemStack != null && itemStack.getType().equals(removeItem.getType())) {
+                    itemStack.setAmount(itemStack.getAmount() - 1);
+                    return;
+                }
+            }
+
+        } catch (IllegalArgumentException | NullPointerException ignored) {
         }
     }
 }

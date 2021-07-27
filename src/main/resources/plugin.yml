@@ -5,4 +5,20 @@
   author: Andre-4949
   commands:
     qol:
-      description: reloads the config
+      description: grants you access to all of the commands this plugin provides (the rest should be obvious by looking at the TabComplete)
+      Usage: /qol (advancedCompost | reloadconfig | saveConfig | simpleHarvest)
+    adminmode:
+      description: sets you in Adminmode (Creative) | inventory & Location are saved and will put you back in survival when executed again
+    viewInventory:
+      description: let's you see the inventory of other players
+    togglemute:
+      description: lets you mute/unmute a player completly (more features comming soon)
+    toggleReadPrivateMessages:
+      description: toggles the ability to see private messages from other players
+    collectiveCommands:
+      description: lets you execute some commands more effectifly; dont forget the seperator " | "
+      usage: /collectiveCommands [whitelist add / op / ...] | [parameters]
+    unlimitedAnvil:
+      description: This command enables/disables the 'too expensive'-text while combining items which have more anvil uses.
+    sendCoordsOfDeathOnRespawn:
+      description: This feature enables/disables the sending of the deathlocation's coords after respawn.
