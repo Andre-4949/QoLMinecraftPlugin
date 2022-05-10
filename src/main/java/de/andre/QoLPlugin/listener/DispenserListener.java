@@ -23,29 +23,13 @@ public class DispenserListener implements QoLListener {
 
         if (event.getBlock().getType() != Material.DISPENSER) return;
 
-
         Location targetBlockLocation = event.getBlock().getLocation();
         Block dispenser = event.getBlock();
         Dispenser dispenser1 = (Dispenser) dispenser.getState();
 
         Directional dispenser_ = (Directional) dispenser.getBlockData();
+        targetBlockLocation.add(dispenser_.getFacing().getDirection());
 
-        switch (dispenser_.getFacing()) {
-            case NORTH:
-                targetBlockLocation.setZ(targetBlockLocation.getZ() - 1);
-                break;
-            case EAST:
-                targetBlockLocation.setX(targetBlockLocation.getX() + 1);
-                break;
-            case SOUTH:
-                targetBlockLocation.setZ(targetBlockLocation.getZ() + 1);
-                break;
-            case WEST:
-                targetBlockLocation.setX(targetBlockLocation.getX() - 1);
-                break;
-            default:
-                return;
-        }
         Block targetBlock = targetBlockLocation.getBlock();
 
         if (event.isCancelled() ||

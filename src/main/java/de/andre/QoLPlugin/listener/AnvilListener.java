@@ -15,6 +15,8 @@ public class AnvilListener implements QoLListener{
     public void placeItemInAnvil(PrepareAnvilEvent event){
         if(controller.getConfig().getUnlimitedCost())
             event.getInventory().setMaximumRepairCost(Integer.MAX_VALUE);
-            event.getInventory().setRepairCost(80);
+            if (event.getInventory().getRepairCost()>39)
+                event.getInventory().setRepairCost(80);
+                event.getViewers().forEach(x->x.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "The repair cost is set to 80 lvls, because the repair cost exceeded the vanilla maximum."));
     }
 }

@@ -8,3 +8,7 @@ advancedCompost:
   materials:
     - ROTTEN_FLESH
     - COPPER_ORE
+vineminer:
+  materials:
+    - STONE
+    -

@@ -31,7 +31,9 @@ public class Main extends JavaPlugin {
         registerCommand("collectiveCommands", new BetterCommands(controller));
         registerCommand("UnlimitedAnvil", new UnlimitedAnvil(controller));
         registerCommand("SendCoordsOfDeathOnRespawn", new SendCoordsOfDeathOnRespawn(controller));
-
+        registerCommand("ping", new Ping(controller));
+        registerCommand("breakprevention", new ToolBreakPreventionCommand(controller));
+        registerCommand("bp", new ToolBreakPreventionCommand(controller));
     }
 
     private void registerCommand(String s, Object e){

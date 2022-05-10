@@ -16,6 +16,9 @@ public class ListenerController {
         listeners.add(new DispenserListener(controller));
         listeners.add(new PlayerListener(controller));
         listeners.add(new AnvilListener(controller));
+        listeners.add(new VineMiner(controller));
+        listeners.add(new FastLeafDecay(controller));
+        listeners.add(new ToolBreakPrevention(controller));
         registerListener();
     }
 

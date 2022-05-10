@@ -27,20 +27,22 @@ public class ConfigController {
     private boolean simpleHarvestActivated = true;
     private ArrayList<Material> simpleHarvestMaterials = new ArrayList<>(Arrays.asList(Material.BEETROOTS, Material.WHEAT, Material.CARROTS, Material.POTATOES));
 
-    private boolean advancedCompostActivated = true;
-    private ArrayList<Material> advancedCompostMaterials = new ArrayList<>(Arrays.asList(Material.ROTTEN_FLESH));
+    private boolean advancedCompostActivated = false;
+    private ArrayList<Material> advancedCompostMaterials = new ArrayList<>(Collections.singletonList(Material.ROTTEN_FLESH));
 
     private HashMap<Player, AdminModeData> adminmodeHashmap = new HashMap<>();
+    private boolean sendMessageOnGamemodeChange = false; // sends a message whenever a player changes gamemode from surivial to creative and doesnt use /adminmode
 
-    private boolean mutedPlayersActivated = true;
+
+    private boolean mutedPlayersActivated = false;
     private ArrayList<Player> mutedPlayers = new ArrayList<>();
 
-    private boolean adminsWhichEnabledPrivateMessageViewingActivated = true; //if the admins should see /msg messages if they enabled it
+    private boolean adminsWhichEnabledPrivateMessageViewingActivated = false; //if the admins should see /msg messages if they enabled it
     private ArrayList<Player> adminsWhichEnabledPrivateMessageViewing = new ArrayList<>();
 
     private HashMap<Player, Location> deadPlayersHashMap = new HashMap<>();
 
-    private boolean unlimitedCost = true;
+    private boolean unlimitedCost = false;
 
     private boolean sendCoordsOfDeathOnRespawn = false;
     //----------------------------------------------------------//
@@ -72,6 +74,20 @@ public class ConfigController {
         loadMutedPlayers(config);
         loadAdminsWhichEnabledPrivateMessageViewing(config);
         loadSendCoordsOfDeathOnRespawn(config);
+        loadSendMessageOnGamemodeChange(config);
+        loadUnlimitedAnvil(config);
+    }
+
+    private void loadUnlimitedAnvil(YamlConfiguration config) {
+        if (config.contains("UnlimitedAnvil")) {
+            this.sendMessageOnGamemodeChange = config.getBoolean("UnlimitedAnvil");
+        }
+    }
+
+    private void loadSendMessageOnGamemodeChange(YamlConfiguration config) {
+        if (config.contains("SendMessageOnGamemodeChange")) {
+            this.sendMessageOnGamemodeChange = config.getBoolean("SendMessageOnGamemodeChange");
+        }
     }
 
     private void loadSimpleHarvestMaterials(YamlConfiguration config) {
@@ -110,8 +126,8 @@ public class ConfigController {
         }
     }
 
-    private void loadSendCoordsOfDeathOnRespawn(YamlConfiguration config){
-        if(config.contains("SendCoordsOfDeathOnRespawn")){
+    private void loadSendCoordsOfDeathOnRespawn(YamlConfiguration config) {
+        if (config.contains("SendCoordsOfDeathOnRespawn")) {
             this.sendCoordsOfDeathOnRespawn = config.getBoolean("SendCoordsOfDeathOnRespawn");
         }
     }
@@ -129,8 +145,9 @@ public class ConfigController {
         saveAdvancedCompostMaterials(ymlConfig, advancedCompostMaterials, advancedCompostActivated);
         saveMutedPlayers(ymlConfig, mutedPlayers, mutedPlayersActivated);
         saveAdminsWhichEnabledPrivateMessageViewing(ymlConfig, adminsWhichEnabledPrivateMessageViewing, adminsWhichEnabledPrivateMessageViewingActivated);
-        saveSendCoordsOfDeathOnRespawn(ymlConfig,sendCoordsOfDeathOnRespawn);
-
+        saveSendCoordsOfDeathOnRespawn(ymlConfig, sendCoordsOfDeathOnRespawn);
+        saveSendMessageOnGamemodeChange(ymlConfig,sendMessageOnGamemodeChange);
+        saveUnlimitedAnvil(ymlConfig, unlimitedCost);
         try {
             ymlConfig.save(this.config.getAbsoluteFile());
             Util.sendInfoLogMessage(controller, this.config.getAbsolutePath());
@@ -140,8 +157,16 @@ public class ConfigController {
         }
     }
 
+    private void saveUnlimitedAnvil(YamlConfiguration config, boolean unlimitedCost) {
+        config.set("UnlimitedAnvil", unlimitedCost);
+    }
+
+    private void saveSendMessageOnGamemodeChange(YamlConfiguration config, boolean sendMessageOnGamemodeChange) {
+        config.set("SendMessageOnGamemodeChange", sendMessageOnGamemodeChange);
+    }
+
     private void saveSendCoordsOfDeathOnRespawn(YamlConfiguration config, boolean sendCoordsOfDeathOnRespawn) {
-        config.set("SendCoordsOfDeathOnRespawn",sendCoordsOfDeathOnRespawn);
+        config.set("SendCoordsOfDeathOnRespawn", sendCoordsOfDeathOnRespawn);
     }
 
     private void saveSimpleHarvestMaterials(YamlConfiguration config, List<Material> simpleHarvestMaterials, boolean simpleHarvestActivated) {
@@ -159,13 +184,13 @@ public class ConfigController {
     }
 
     private void saveMutedPlayers(YamlConfiguration config, ArrayList<Player> mutedPlayers, boolean mutedPlayersActivated) {
-        config.set("mutedPlayers.players",mutedPlayers.stream().map(HumanEntity::getName).collect(Collectors.toList()));
-        config.set("mutedPlayers.activated",mutedPlayersActivated);
+        config.set("mutedPlayers.players", mutedPlayers.stream().map(HumanEntity::getName).collect(Collectors.toList()));
+        config.set("mutedPlayers.activated", mutedPlayersActivated);
     }
 
     private void saveAdminsWhichEnabledPrivateMessageViewing(YamlConfiguration config, ArrayList<Player> adminsWhichEnabledPrivateMessageViewing, boolean adminsWhichEnabledPrivateMessageViewingActivated) {
-        config.set("privateMessageViewing.admins",adminsWhichEnabledPrivateMessageViewing.stream().map(HumanEntity::getName).collect(Collectors.toList()));
-        config.set("privateMessageViewing.activated",adminsWhichEnabledPrivateMessageViewingActivated);
+        config.set("privateMessageViewing.admins", adminsWhichEnabledPrivateMessageViewing.stream().map(HumanEntity::getName).collect(Collectors.toList()));
+        config.set("privateMessageViewing.activated", adminsWhichEnabledPrivateMessageViewingActivated);
     }
 
     /*
@@ -206,6 +231,10 @@ public class ConfigController {
 
     public boolean getSendCoordsOfDeathOnRespawn() {
         return this.sendCoordsOfDeathOnRespawn;
+    }
+
+    public boolean getSendMessageOnGamemodeChange() {
+        return sendMessageOnGamemodeChange;
     }
 
     /*
@@ -252,8 +281,8 @@ public class ConfigController {
         this.adminsWhichEnabledPrivateMessageViewing.add(player);
     }
 
-    public void addPlayerToDeadPlayers(Player p,Location l){
-        this.deadPlayersHashMap.put(p,l);
+    public void addPlayerToDeadPlayers(Player p, Location l) {
+        this.deadPlayersHashMap.put(p, l);
     }
     /*
      Remove
@@ -271,7 +300,7 @@ public class ConfigController {
         this.advancedCompostMaterials.remove(advancedCompostMaterials);
     }
 
-    public void removePlayerFromDeadPlayers(Player p){
+    public void removePlayerFromDeadPlayers(Player p) {
         this.deadPlayersHashMap.remove(p);
     }
 }

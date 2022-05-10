@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ViewInventory implements CommandExecutor, TabCompleter {
     private PluginController controller;
@@ -39,7 +38,7 @@ public class ViewInventory implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         ArrayList<String> completions = new ArrayList<>();
-        if(args.length==0)completions.addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
+        if(args.length==1)Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).forEach(completions::add);
         return completions;
     }
 }

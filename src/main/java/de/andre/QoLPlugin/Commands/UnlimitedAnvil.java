@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UnlimitedAnvil implements TabCompleter, CommandExecutor {
+public class UnlimitedAnvil implements CommandExecutor, TabCompleter {
     private final PluginController controller;
     private final String TRUE = "true";
     private final String FALSE = "false";

@@ -17,9 +17,8 @@ public class BetterCommands implements CommandExecutor, TabCompleter {
     public BetterCommands(PluginController controller) {
         this.controller = controller;
     }
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!sender.isOp())return true;
         try {
             ArrayList<Integer> seperatorindices = new ArrayList<>();
@@ -54,7 +53,7 @@ public class BetterCommands implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String[] args) {
         ArrayList<String> completions = new ArrayList<>();
         if (args.length == 1) {
             completions.add("enter Command or seperator ('|')");

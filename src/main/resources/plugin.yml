@@ -22,3 +22,11 @@
       description: This command enables/disables the 'too expensive'-text while combining items which have more anvil uses.
     sendCoordsOfDeathOnRespawn:
       description: This feature enables/disables the sending of the deathlocation's coords after respawn.
+    ping:
+      description: returns your ping to the server
+    breakprevention:
+      description:
+        doesn't let you break your tools if they have mending, they simply repair themselves at 1 durability with your xp
+    bp:
+      description:
+        see breakprevention

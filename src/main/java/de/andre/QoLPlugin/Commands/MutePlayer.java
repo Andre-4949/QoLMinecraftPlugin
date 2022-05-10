@@ -41,19 +41,21 @@ public class MutePlayer implements TabCompleter, CommandExecutor {
                 return true;
             }
             assert targetPlayer != null;
-            if(targetPlayer.isOp()){
-                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX()+"You can't mute someone with equal rights as you.");
+            if (targetPlayer.isOp()) {
+                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "You can't mute someone with equal rights as you.");
                 return true;
-            } else if(targetPlayer.equals(p)){
-                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX()+"You can't mute yourself.");
+            } else if (targetPlayer.equals(p)) {
+                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "You can't mute yourself.");
             }
 
-            if (!controller.getConfig().getMutedPlayers().contains(targetPlayer))
+            if (!controller.getConfig().getMutedPlayers().contains(targetPlayer)) {
                 controller.getConfig().getMutedPlayers().add(targetPlayer);
-            else {
+                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "This player is now muted until you unmute him.");
+            } else {
                 controller.getConfig().getMutedPlayers().remove(targetPlayer);
+                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "This player is now unmuted until you mute him.");
             }
-            sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "This player is now muted until you unmute him.");
+
 
         }
         return true;
@@ -61,10 +63,11 @@ public class MutePlayer implements TabCompleter, CommandExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        ArrayList<String> completions = new ArrayList<>();
-        if (args.length == 0) {
+        ArrayList<String> completions = new ArrayList<String>() {{
+            add(LIST);
+        }};
+        if (args.length == 1) {
             Bukkit.getOnlinePlayers().forEach(x -> completions.add(x.getName()));
-            completions.add(LIST);
         }
         return completions;
     }

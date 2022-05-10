@@ -41,9 +41,14 @@ public class FarmingListener implements QoLListener {
 
             if (age.getAge() == age.getMaximumAge()) {
                 block.getDrops(
-                        p.getInventory().getItemInMainHand(), p).
+                                p.getInventory().getItemInMainHand(), p).
                         forEach(item ->
-                                p.getWorld().dropItemNaturally(block.getLocation(), item));
+//                                p.getWorld().dropItemNaturally(block.getLocation(), item)
+                                        p.getInventory().addItem(item).forEach((k,value)-> {
+                                            if ((!value.getType().equals(Material.AIR)))
+                                                p.getWorld().dropItem(p.getLocation(), value);
+                                        })
+                        );
 
                 block.setType(block.getType());
 
