@@ -1,9 +1,9 @@
 package de.andre.QoLPlugin.Commands;
 
+import de.andre.QoLPlugin.Util;
 import de.andre.QoLPlugin.controller.PluginController;
 import de.andre.QoLPlugin.listener.ToolBreakPrevention;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,6 +19,7 @@ import java.util.List;
 
 public class ToolBreakPreventionCommand implements CommandExecutor, TabCompleter {
     private final PluginController controller;
+    private final String COMMAND = "tellraw %s [{\"text\":\"[Server]\",\"color\":\"gold\",\"bold\":true,\"italic\":true,\"underlined\":true,\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"Boo\"}]}},{\"text\":\" I see what you tried... and i don't like it\",\"color\":\"white\",\"bold\":false,\"italic\":false,\"underlined\":false,\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"i appreciate the effort tho\"}]}}]";
 
     public ToolBreakPreventionCommand(PluginController controller) {
         this.controller = controller;
@@ -34,7 +35,8 @@ public class ToolBreakPreventionCommand implements CommandExecutor, TabCompleter
             return true;
         }
         if (player.getInventory().getItemInMainHand().getType().equals(Material.ENCHANTED_BOOK)) {
-            Bukkit.dispatchCommand(sender, "/tellraw @p [{\"text\":\"[Server]\",\"color\":\"gold\",\"bold\":true,\"italic\":true,\"underlined\":true,\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"Boo\"}]}},{\"text\":\" I see what you tried... and i don't like it\",\"color\":\"white\",\"bold\":false,\"italic\":false,\"underlined\":false,\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"i appreciate the effort tho\"}]}}]");
+            Util.executeCommand(String.format(COMMAND, Util.componentToString(player.displayName())));
+            return true;
         }
         if (!player.getInventory().getItemInMainHand().getItemMeta().hasEnchant(Enchantment.MENDING)) {
             sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "Your item doesn't have mending, please apply mending and execute the Command again.");
@@ -43,7 +45,7 @@ public class ToolBreakPreventionCommand implements CommandExecutor, TabCompleter
 
         List<Component> lore = player.getInventory().getItemInMainHand().lore()==null ? new ArrayList<Component>(){{add(Component.text().content(ToolBreakPrevention.DETECTSTRING).build());}} : new ArrayList<>();
         player.getInventory().getItemInMainHand().lore(lore);
-        player.sendMessage("Break Prevention updated");
+        player.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "Break Prevention updated");
         return true;
     }
 

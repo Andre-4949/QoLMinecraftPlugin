@@ -26,4 +26,8 @@ public class PluginController {
         this.config = config;
         config.onEnable();
     }
+
+    public ListenerController getListenerController() {
+        return listenerController;
+    }
 }

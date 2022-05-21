@@ -30,3 +30,8 @@
     bp:
       description:
         see breakprevention
+    vineMiner:
+      description: activate / deactivate vineMiner
+    vm:
+      description:
+        see vineMiner

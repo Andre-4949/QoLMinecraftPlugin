@@ -1,13 +1,15 @@
 package de.andre.QoLPlugin.listener;
 
 import de.andre.QoLPlugin.controller.PluginController;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
@@ -28,30 +30,36 @@ public class ToolBreakPrevention implements QoLListener {
             return;
         int itemDurability = durabilityLeft(event.getItem());
 
-        Bukkit.getLogger().info(String.valueOf(itemDurability));
-
         if (itemDurability == 10) {//warnings are never that bad
             event.getPlayer().sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + String.format("Your %s has low durability.", event.getItem().getType().toString().toLowerCase()));
         }
-        if (!event.getItem().getType().equals(Material.ELYTRA) && !(itemDurability <= 1)) {
+        if (!event.getItem().getType().equals(Material.ELYTRA) && !(itemDurability <= 2)) {
             return;//for "normal" Items
         } else {
-            if (!(itemDurability <= 2)) {//Elytra as special case, at one durability it is that other form, when you have to repair it with leather
+            if (!(itemDurability <= 3)) {//Elytra as special case, at one durability it is that other form, when you have to repair it with leather
                 return;
             }
         }
         int playerXp = getPlayerExp(event.getPlayer()); //check out credit below
+        Damageable damageable = (Damageable) event.getItem().getItemMeta();
+
+        int diff = damageable.getDamage();
 
         if (playerXp <= 0) {//if he doesn't have xp to repair the items why bother with this event
+
+            if (itemDurability == 2) {//this is a warning
+                event.setCancelled(true);
+                Location loc = event.getPlayer().getLocation();
+                damageable.setDamage(damageable.getDamage() + 1);
+                event.getItem().setItemMeta(damageable);
+                event.getPlayer().kick(Component.text(String.format("Your tool almost broke, because you had no xp to repair it. Your Location was x:%s, y:%s, z:%s", (int)loc.getX(), (int)loc.getY(), (int)loc.getZ())), PlayerKickEvent.Cause.PLUGIN);
+                return;
+            }
             return;
         }
 
 
-        Damageable damageable = ((Damageable) event.getItem().getItemMeta());
-
-        int diff = damageable.getDamage();
-
-        damageable.setDamage(0);//after that the item is basically as new || full durability
+        damageable.setDamage(Math.min(Math.max(diff - playerXp, 0), event.getItem().getType().getMaxDurability()));//after that the item is basically as new || full durability
         event.getItem().setItemMeta(damageable);//overwrite old itemmeta
 
 
@@ -73,6 +81,10 @@ public class ToolBreakPrevention implements QoLListener {
     public static int durabilityLeft(ItemStack i) {
         Damageable damageable = ((Damageable) i.getItemMeta());
         return i.getType().getMaxDurability() - damageable.getDamage();
+    }
+
+    public static boolean isProtected(ItemStack i){
+        return i.lore()!=null && Objects.requireNonNull(i.lore()).stream().anyMatch(x-> PlainTextComponentSerializer.plainText().serialize(x).equals(ToolBreakPrevention.DETECTSTRING));
     }
 
     /*

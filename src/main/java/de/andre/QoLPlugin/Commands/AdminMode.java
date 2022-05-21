@@ -13,17 +13,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class AdminMode implements CommandExecutor, TabCompleter {
     private PluginController controller;
+    public static int SECONDSTOTICKS = 20;
 
     public AdminMode(PluginController controller) {
         this.controller = controller;
@@ -42,9 +41,9 @@ public class AdminMode implements CommandExecutor, TabCompleter {
                 p.getInventory().setContents(playerInv);
                 p.getInventory().setStorageContents(p.getInventory().getStorageContents());
                 p.teleport(playerLoc);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15 * 20, 5, true));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15 * SECONDSTOTICKS, 5, true));
+                p.setVelocity(new Vector());
                 p.setGameMode(GameMode.SURVIVAL);
-
                 HashMap<Player, AdminModeData> newAdminModeHashmap = controller.getConfig().getAdminmodeHashmap();
                 newAdminModeHashmap.remove(p);
                 controller.getConfig().setAdminmodeHashmap(newAdminModeHashmap);
@@ -73,7 +72,7 @@ public class AdminMode implements CommandExecutor, TabCompleter {
             try {
                 if (adminModeHashmap.get(p).getInv() != null &&
                         adminModeHashmap.get(p).getLoc() != null) {
-                    hashmapEntry = adminModeHashmap.get(p).getInv().toString() + " " +
+                    hashmapEntry = Arrays.toString(adminModeHashmap.get(p).getInv()) + " " +
                             (adminModeHashmap.get(p).getLoc()).toString();
                 }
             } catch (Exception ignored) {

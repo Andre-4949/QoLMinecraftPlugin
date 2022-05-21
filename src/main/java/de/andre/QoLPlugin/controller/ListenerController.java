@@ -27,4 +27,11 @@ public class ListenerController {
         listeners.forEach(listener->controller.getMain().getServer().getPluginManager().registerEvents(listener, controller.getMain()));
     }
 
+    public QoLListener getListener(Class<? extends QoLListener> c){
+        for (QoLListener listener : listeners) {
+            if (listener.getClass().equals(c))return listener;
+        }
+        return null;
+    }
+
 }

@@ -34,6 +34,8 @@ public class Main extends JavaPlugin {
         registerCommand("ping", new Ping(controller));
         registerCommand("breakprevention", new ToolBreakPreventionCommand(controller));
         registerCommand("bp", new ToolBreakPreventionCommand(controller));
+        registerCommand("vineMiner", new VineMinerCommand(controller));
+        registerCommand("vm", new VineMinerCommand(controller));
     }
 
     private void registerCommand(String s, Object e){

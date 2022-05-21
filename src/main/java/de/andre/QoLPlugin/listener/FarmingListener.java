@@ -51,8 +51,6 @@ public class FarmingListener implements QoLListener {
                         );
 
                 block.setType(block.getType());
-
-                event.setCancelled(true);
             }
 
         }

@@ -1,17 +1,23 @@
 package de.andre.QoLPlugin.listener;
 
+import de.andre.QoLPlugin.Util;
 import de.andre.QoLPlugin.controller.PluginController;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class FastLeafDecay implements QoLListener {
     private final PluginController controller;
-    private ArrayList<Block> leaves = new ArrayList<>();
+    private static ArrayList<Block> leaves = new ArrayList<>();
 
     public FastLeafDecay(PluginController controller) {
         this.controller = controller;
@@ -20,20 +26,30 @@ public class FastLeafDecay implements QoLListener {
     @EventHandler
     public void onLeavesDecay(LeavesDecayEvent event) {
         leaves.add(event.getBlock());
-        leavesRemove(event.getBlock());
-        controller.getMain().getServer().getScheduler().runTaskLater(controller.getMain(), () -> event.getBlock().breakNaturally(), new Random().nextInt(400) + 1);
-        leaves.remove(event.getBlock());
+        leavesRemove(event.getBlock().getLocation(), event.getBlock().getType());
+        controller.getMain().getServer().getScheduler().runTaskLater(controller.getMain(), (@NotNull Runnable) event.getBlock()::breakNaturally, 1);
     }
 
-    private void leavesRemove(Block b) {
-        VineMiner.getNeighbouringBlocks(b).stream()
-                .filter(x -> x.getType().equals(b.getType()))
-                .filter(x -> {
-                    Leaves leaves = ((Leaves) x.getBlockData());
-                    return !leaves.isPersistent() && leaves.getDistance() > 7;
-                })
-                .filter(x -> !leaves.contains(x))
-                .forEach(x -> controller.getMain().getServer().getPluginManager().callEvent(new LeavesDecayEvent(x)));
+    @EventHandler
+    private void onBlockBreak(BlockBreakEvent event){
+        if (!event.isCancelled() && event.getBlock().getBlockData() instanceof Leaves) leavesRemove(event.getBlock().getLocation(),event.getBlock().getType());
     }
 
+    public void onLeavesDecay(List<Block> l) {
+        leaves.addAll(l);
+        l.forEach(x->leavesRemove(x.getLocation(),x.getType()));
+        l.forEach(block -> block.breakNaturally(false));
+    }
+
+    private void leavesRemove(Location l, Material m) {
+        onLeavesDecay(
+                Util.getNeighbouringBlocks(l.getBlock()).stream()
+                        .filter(x -> x.getType().equals(m))
+                        .filter(x -> !leaves.contains(x))
+                        .filter(x -> {
+                            if (!(x.getBlockData() instanceof Leaves)) return false;
+                            Leaves leaves = ((Leaves) x.getBlockData());
+                            return !leaves.isPersistent() && leaves.getDistance() >= 7;
+                        }).collect(Collectors.toList()));
+    }
 }
