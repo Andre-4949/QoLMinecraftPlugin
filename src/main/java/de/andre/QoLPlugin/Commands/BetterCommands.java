@@ -46,7 +46,7 @@ public class BetterCommands implements CommandExecutor, TabCompleter {
             });
 
         } catch (Exception e) {
-            sender.sendMessage(controller.getConfig().getMessages().getGENERALERROR());
+            sender.sendMessage(controller.getConfig().getMessageController().getGENERALERROR());
         }
 
         return true;

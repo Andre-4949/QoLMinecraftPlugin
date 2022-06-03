@@ -17,7 +17,6 @@ import java.util.Objects;
 
 public class ToolBreakPrevention implements QoLListener {
     private final PluginController controller;
-    public static final String DETECTSTRING = "almost unbreakable";
 
     public ToolBreakPrevention(PluginController controller) {
         this.controller = controller;
@@ -26,12 +25,12 @@ public class ToolBreakPrevention implements QoLListener {
     @EventHandler
     public void onItemUse(PlayerItemDamageEvent event) {
         //return when the code below shouldn't be executed
-        if (event.getItem().lore() == null || !event.getItem().getItemMeta().hasEnchant(Enchantment.MENDING) || Objects.requireNonNull(event.getItem().lore()).stream().noneMatch(x -> PlainTextComponentSerializer.plainText().serialize(x).equalsIgnoreCase(DETECTSTRING)))
+        if (!controller.getConfig().isToolBreakPreventionEnabled() || event.getItem().lore() == null || !event.getItem().getItemMeta().hasEnchant(Enchantment.MENDING) || Objects.requireNonNull(event.getItem().lore()).stream().noneMatch(x -> PlainTextComponentSerializer.plainText().serialize(x).equalsIgnoreCase(controller.getConfig().getToolBreakPreventionDetectString())))
             return;
         int itemDurability = durabilityLeft(event.getItem());
 
         if (itemDurability == 10) {//warnings are never that bad
-            event.getPlayer().sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + String.format("Your %s has low durability.", event.getItem().getType().toString().toLowerCase()));
+            event.getPlayer().sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + String.format("Your %s has low durability.", event.getItem().getType().toString().toLowerCase()));
         }
         if (!event.getItem().getType().equals(Material.ELYTRA) && !(itemDurability <= 2)) {
             return;//for "normal" Items
@@ -69,7 +68,7 @@ public class ToolBreakPrevention implements QoLListener {
         changePlayerExp(event.getPlayer(), playerXp - diff); // give back the xp minus the difference
 
         //let's inform the player he almost broke his stuff
-        event.getPlayer().sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + String.format("Your %s almost broke. We tried to use your experience to repair it.", event.getItem().getType().toString().toLowerCase()));
+        event.getPlayer().sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + String.format("Your %s almost broke. We tried to use your experience to repair it.", event.getItem().getType().toString().toLowerCase()));
 
         if (event.getItem().getType().equals(Material.ELYTRA)) {//and let's just for convenience open the elytra
             event.getPlayer().setGliding(true);
@@ -83,8 +82,8 @@ public class ToolBreakPrevention implements QoLListener {
         return i.getType().getMaxDurability() - damageable.getDamage();
     }
 
-    public static boolean isProtected(ItemStack i){
-        return i.lore()!=null && Objects.requireNonNull(i.lore()).stream().anyMatch(x-> PlainTextComponentSerializer.plainText().serialize(x).equals(ToolBreakPrevention.DETECTSTRING));
+    public static boolean isProtected(ItemStack i, PluginController controller){
+        return i.lore()!=null && Objects.requireNonNull(i.lore()).stream().anyMatch(x-> PlainTextComponentSerializer.plainText().serialize(x).equals(controller.getConfig().getToolBreakPreventionDetectString()));
     }
 
     /*

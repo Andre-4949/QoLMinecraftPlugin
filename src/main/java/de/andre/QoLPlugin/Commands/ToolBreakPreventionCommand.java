@@ -2,7 +2,6 @@ package de.andre.QoLPlugin.Commands;
 
 import de.andre.QoLPlugin.Util;
 import de.andre.QoLPlugin.controller.PluginController;
-import de.andre.QoLPlugin.listener.ToolBreakPrevention;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -31,7 +30,7 @@ public class ToolBreakPreventionCommand implements CommandExecutor, TabCompleter
         Player player = ((Player) sender).getPlayer();
         if (player == null) return true;
         if (player.getInventory().getItemInMainHand().getType() == Material.AIR) {
-            sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "You have to have a tool/armor in your hand to use this command.");
+            sender.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "You have to have a tool/armor in your hand to use this command.");
             return true;
         }
         if (player.getInventory().getItemInMainHand().getType().equals(Material.ENCHANTED_BOOK)) {
@@ -39,13 +38,15 @@ public class ToolBreakPreventionCommand implements CommandExecutor, TabCompleter
             return true;
         }
         if (!player.getInventory().getItemInMainHand().getItemMeta().hasEnchant(Enchantment.MENDING)) {
-            sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "Your item doesn't have mending, please apply mending and execute the Command again.");
+            sender.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "Your item doesn't have mending, please apply mending and execute the Command again.");
             return true;
         }
 
-        List<Component> lore = player.getInventory().getItemInMainHand().lore()==null ? new ArrayList<Component>(){{add(Component.text().content(ToolBreakPrevention.DETECTSTRING).build());}} : new ArrayList<>();
+        List<Component> lore = player.getInventory().getItemInMainHand().lore()==null ? new ArrayList<>() {{
+            add(Component.text().content(controller.getConfig().getToolBreakPreventionDetectString()).build());
+        }} : new ArrayList<>();
         player.getInventory().getItemInMainHand().lore(lore);
-        player.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "Break Prevention updated");
+        player.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "Break Prevention updated");
         return true;
     }
 

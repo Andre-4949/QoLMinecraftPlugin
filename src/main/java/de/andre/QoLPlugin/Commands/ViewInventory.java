@@ -23,12 +23,12 @@ public class ViewInventory implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(!(sender instanceof Player)||!sender.isOp()||args.length>1)return true;
-        Player p = (Player) sender;
-        Player targetPlayer;
-        if(Bukkit.getPlayer(args[0])!=null)targetPlayer = Bukkit.getPlayer(args[0]);
-        else{return true;}
-        assert targetPlayer != null;
+        if (!(sender instanceof Player p) || !sender.isOp() || args.length > 1) return true;
+
+        Player targetPlayer = Bukkit.getPlayer(args[0]);
+
+        if (targetPlayer == null) return true;
+
         Inventory targetPlayerInventory = targetPlayer.getInventory();
         p.openInventory(targetPlayerInventory);
 

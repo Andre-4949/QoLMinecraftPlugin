@@ -9,6 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SpawnCategory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,25 +70,24 @@ public class QolDefaultCommand implements CommandExecutor, TabCompleter {
     }
 
     private void modifyConfig(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) return;
-        Player p = (Player) sender;
+        if (!(sender instanceof Player p)) return;
         try {
-            if (args[1].equalsIgnoreCase(       AMBIENTSPAWNLIMIT))p.getWorld().setAmbientSpawnLimit(Integer.parseInt(args[2]));
-            else if(args[1].equalsIgnoreCase(   ANIMALSPAWNLIMIT))p.getWorld().setAnimalSpawnLimit(Integer.parseInt(args[2]));
-            else if(args[1].equalsIgnoreCase(   MONSTERSPAWNLIMIT))p.getWorld().setMonsterSpawnLimit(Integer.parseInt(args[2]));
-            else if(args[1].equalsIgnoreCase(   WATERAMBIENTSPAWNLIMIT))p.getWorld().setWaterAmbientSpawnLimit(Integer.parseInt(args[2]));
-            else if(args[1].equalsIgnoreCase(   WATERANIMALSPAWNLIMIT))p.getWorld().setWaterAnimalSpawnLimit(Integer.parseInt(args[2]));
+            if (args[1].equalsIgnoreCase(       AMBIENTSPAWNLIMIT))p.getWorld().setSpawnLimit(SpawnCategory.AMBIENT,Integer.parseInt(args[2]));
+            else if(args[1].equalsIgnoreCase(   ANIMALSPAWNLIMIT))p.getWorld().setSpawnLimit(SpawnCategory.ANIMAL,Integer.parseInt(args[2]));
+            else if(args[1].equalsIgnoreCase(   MONSTERSPAWNLIMIT))p.getWorld().setSpawnLimit(SpawnCategory.MONSTER,Integer.parseInt(args[2]));
+            else if(args[1].equalsIgnoreCase(   WATERAMBIENTSPAWNLIMIT))p.getWorld().setSpawnLimit(SpawnCategory.WATER_AMBIENT,Integer.parseInt(args[2]));
+            else if(args[1].equalsIgnoreCase(   WATERANIMALSPAWNLIMIT))p.getWorld().setSpawnLimit(SpawnCategory.WATER_ANIMAL,Integer.parseInt(args[2]));
             else if(args[1].equalsIgnoreCase(   VIEWDISTANCE))p.getWorld().setViewDistance(Integer.parseInt(args[2]));
         } catch (Exception e) {
-            sender.sendMessage(controller.getConfig().getMessages().getGENERALERROR());
+            sender.sendMessage(controller.getConfig().getMessageController().getGENERALERROR());
             Util.sendWarnLogMessage(controller,e.toString());
         }
     }
 
     private void saveConfig(CommandSender sender) {
         controller.getConfig().saveConfig();
-        if (sender instanceof Player) sender.sendMessage(controller.getConfig().getMessages().getSAVECONFIGINGAME());
-        else sender.sendMessage(controller.getConfig().getMessages().getSAVECONFIGCONSOLE());
+        if (sender instanceof Player) sender.sendMessage(controller.getConfig().getMessageController().getSAVECONFIGINGAME());
+        else sender.sendMessage(controller.getConfig().getMessageController().getSAVECONFIGCONSOLE());
     }
 
 
@@ -103,16 +103,16 @@ public class QolDefaultCommand implements CommandExecutor, TabCompleter {
         if (args[1].equalsIgnoreCase(ADD)) {
             if (addMaterialToSimpleHarvest(sender, args) //This returns a boolean if it was successful or not.
             ) {
-                sender.sendMessage(controller.getConfig().getMessages().getMATERIALADDEDSUCCESS());
+                sender.sendMessage(controller.getConfig().getMessageController().getMATERIALADDEDSUCCESS());
             } else {
-                sender.sendMessage(controller.getConfig().getMessages().getERRORADDMATERIAL());
+                sender.sendMessage(controller.getConfig().getMessageController().getERRORADDMATERIAL());
             }
         } else if (args[1].equalsIgnoreCase(REMOVE)) {
             if (removeMaterialFromSimpleHarvest(sender, args) //This returns a boolean if it was successful or not.
             ) {
-                sender.sendMessage(controller.getConfig().getMessages().getMATERIALREMOVEDSUCCESS());
+                sender.sendMessage(controller.getConfig().getMessageController().getMATERIALREMOVEDSUCCESS());
             } else {
-                sender.sendMessage(controller.getConfig().getMessages().getERRORADDMATERIAL());
+                sender.sendMessage(controller.getConfig().getMessageController().getERRORADDMATERIAL());
             }
         }
     }
@@ -121,16 +121,16 @@ public class QolDefaultCommand implements CommandExecutor, TabCompleter {
         if (args[1].equalsIgnoreCase(ADD)) {
             if (addMaterialToAdvancedCompost(sender, args) //This returns a boolean if it was successful or not.
             ) {
-                sender.sendMessage(controller.getConfig().getMessages().getMATERIALADDEDSUCCESS());
+                sender.sendMessage(controller.getConfig().getMessageController().getMATERIALADDEDSUCCESS());
             } else {
-                sender.sendMessage(controller.getConfig().getMessages().getERRORADDMATERIAL());
+                sender.sendMessage(controller.getConfig().getMessageController().getERRORADDMATERIAL());
             }
         } else if (args[1].equalsIgnoreCase(REMOVE)) {
             if (removeMaterialFromAdvancedCompost(sender, args) //This returns a boolean if it was successful or not.
             ) {
-                sender.sendMessage(controller.getConfig().getMessages().getMATERIALREMOVEDSUCCESS());
+                sender.sendMessage(controller.getConfig().getMessageController().getMATERIALREMOVEDSUCCESS());
             } else {
-                sender.sendMessage(controller.getConfig().getMessages().getERRORADDMATERIAL());
+                sender.sendMessage(controller.getConfig().getMessageController().getERRORADDMATERIAL());
             }
         }
     }
@@ -196,15 +196,12 @@ public class QolDefaultCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         ArrayList<String> completions = new ArrayList<>();
-        switch (args.length) {
-            case 1:
-                return onTabCompleteArgsLength1(sender, command, alias, args);
-            case 2:
-                return onTabCompleteArgsLength2(sender, command, alias, args);
-            case 3:
-                return onTabCompleteArgsLength3(sender, command, alias, args);
-        }
-        return completions;
+        return switch (args.length) {
+            case 1 -> onTabCompleteArgsLength1(sender, command, alias, args);
+            case 2 -> onTabCompleteArgsLength2(sender, command, alias, args);
+            case 3 -> onTabCompleteArgsLength3(sender, command, alias, args);
+            default -> completions;
+        };
     }
 
     public ArrayList<String> onTabCompleteArgsLength1(CommandSender sender, Command command, String alias, String[] args) {
@@ -228,8 +225,7 @@ public class QolDefaultCommand implements CommandExecutor, TabCompleter {
     public ArrayList<String> onTabCompleteArgsLength3(CommandSender sender, Command command, String alias, String[] args) {
         ArrayList<String> completions = new ArrayList<>();
 
-        if ((args[0].equalsIgnoreCase(SIMPLEHARVEST) || args[0].equalsIgnoreCase(ADVANCEDCOMPOST)) && args[1].equalsIgnoreCase(ADD) && sender instanceof Player) {
-            Player p = (Player) sender;
+        if ((args[0].equalsIgnoreCase(SIMPLEHARVEST) || args[0].equalsIgnoreCase(ADVANCEDCOMPOST)) && args[1].equalsIgnoreCase(ADD) && sender instanceof Player p) {
             completions.add(p.getInventory().getItemInMainHand().getType().toString());
             if (p.getTargetBlock(10) != null) completions.add(Objects.requireNonNull(p.getTargetBlock(10)).getType().toString());
         } else if (args[0].equalsIgnoreCase(SIMPLEHARVEST) && args[1].equalsIgnoreCase(REMOVE))
@@ -242,17 +238,17 @@ public class QolDefaultCommand implements CommandExecutor, TabCompleter {
 
     public void sendHelpMessage(CommandSender sender) {
         String helpMessage =
-                "qol: \n" +
-                        "    - advancedCompost:\n" +
-                        "        - add [MaterialName(Suggestions is the Block you are looking at and the item you are holding)]\n" +
-                        "        - list\n" +
-                        "        - remove [MaterialName(Suggestions is the Block you are looking at and the item you are holding)]\n" +
-                        "    - simpleHarvest:" +
-                        "        - add [MaterialName(Suggestions is the Block you are looking at and the item you are holding)]\n" +
-                        "        - list\n" +
-                        "        - remove [MaterialName(Suggestions is the Block you are looking at and the item you are holding)]\n" +
-                        "    - saveConfig: saves the config\n" +
-                        "    - reloadConfig: reloads the Config from the config.yml file in the plugins/QoLPlugin folder";
+                """
+                        qol:\s
+                            - advancedCompost:
+                                - add [MaterialName(Suggestions is the Block you are looking at and the item you are holding)]
+                                - list
+                                - remove [MaterialName(Suggestions is the Block you are looking at and the item you are holding)]
+                            - simpleHarvest:        - add [MaterialName(Suggestions is the Block you are looking at and the item you are holding)]
+                                - list
+                                - remove [MaterialName(Suggestions is the Block you are looking at and the item you are holding)]
+                            - saveConfig: saves the config
+                            - reloadConfig: reloads the Config from the config.yml file in the plugins/QoLPlugin folder""";
         sender.sendMessage(helpMessage);
     }
 }

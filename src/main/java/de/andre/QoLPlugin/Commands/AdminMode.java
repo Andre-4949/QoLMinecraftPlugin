@@ -2,6 +2,7 @@ package de.andre.QoLPlugin.Commands;
 
 import de.andre.QoLPlugin.AdditionalClasses.AdminModeData;
 import de.andre.QoLPlugin.Util;
+import de.andre.QoLPlugin.controller.ConfigController;
 import de.andre.QoLPlugin.controller.PluginController;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -22,7 +23,6 @@ import java.util.*;
 
 public class AdminMode implements CommandExecutor, TabCompleter {
     private PluginController controller;
-    public static int SECONDSTOTICKS = 20;
 
     public AdminMode(PluginController controller) {
         this.controller = controller;
@@ -30,8 +30,8 @@ public class AdminMode implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) return true;
-        Player p = (Player) sender;
+        if (!(sender instanceof Player p)) return true;
+        if (!controller.getConfig().isAdminModeEnabled())return true;
         if (!p.isOp()) return true;
         try {
             if (controller.getConfig().getAdminmodeHashmap().containsKey(p)) {
@@ -41,7 +41,7 @@ public class AdminMode implements CommandExecutor, TabCompleter {
                 p.getInventory().setContents(playerInv);
                 p.getInventory().setStorageContents(p.getInventory().getStorageContents());
                 p.teleport(playerLoc);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15 * SECONDSTOTICKS, 5, true));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15 * ConfigController.SECONDSTOTICKS, 5, true));
                 p.setVelocity(new Vector());
                 p.setGameMode(GameMode.SURVIVAL);
                 HashMap<Player, AdminModeData> newAdminModeHashmap = controller.getConfig().getAdminmodeHashmap();
@@ -85,7 +85,7 @@ public class AdminMode implements CommandExecutor, TabCompleter {
             Util.sendMessageToAdmins(controller, "There was an Error while performing the /adminmode command. Please contact the developers immediately!");
 
             p.setGameMode(GameMode.CREATIVE);
-            p.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "You are now in the creative mode due to an Error. sorry :|");
+            p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "You are now in the creative mode due to an Error. sorry :|");
         }
         return true;
     }

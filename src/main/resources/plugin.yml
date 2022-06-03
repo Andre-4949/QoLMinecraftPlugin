@@ -35,3 +35,6 @@
     vm:
       description:
         see vineMiner
+    villagerselect:
+      description:
+        let's you choose the enchantments of your villagers instead of standing there for hours not getting what you wanted

@@ -24,36 +24,36 @@ public class MutePlayer implements TabCompleter, CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!sender.isOp()) return true;
-        if (sender instanceof Player && args.length == 1) {
+        if (!controller.getConfig().isMutedPlayersEnabled())return true;
+        if (sender instanceof Player p && args.length == 1) {
 
             if (args[0].equalsIgnoreCase(LIST)) {
                 sender.sendMessage(controller.getConfig().getMutedPlayers().toString());
                 return true;
             }
 
-            Player p = ((Player) sender);
             Player targetPlayer;
 
             try {
                 targetPlayer = Bukkit.getPlayer(args[0]);
             } catch (Exception e) {
-                sender.sendMessage(controller.getConfig().getMessages().getGENERALERROR());
+                sender.sendMessage(controller.getConfig().getMessageController().getGENERALERROR());
                 return true;
             }
             assert targetPlayer != null;
             if (targetPlayer.isOp()) {
-                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "You can't mute someone with equal rights as you.");
+                sender.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "You can't mute someone with equal rights as you.");
                 return true;
             } else if (targetPlayer.equals(p)) {
-                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "You can't mute yourself.");
+                sender.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "You can't mute yourself.");
             }
 
             if (!controller.getConfig().getMutedPlayers().contains(targetPlayer)) {
                 controller.getConfig().getMutedPlayers().add(targetPlayer);
-                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "This player is now muted until you unmute him.");
+                sender.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "This player is now muted until you unmute him.");
             } else {
                 controller.getConfig().getMutedPlayers().remove(targetPlayer);
-                sender.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "This player is now unmuted until you mute him.");
+                sender.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "This player is now unmuted until you mute him.");
             }
 
 
@@ -63,7 +63,7 @@ public class MutePlayer implements TabCompleter, CommandExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        ArrayList<String> completions = new ArrayList<String>() {{
+        ArrayList<String> completions = new ArrayList<>() {{
             add(LIST);
         }};
         if (args.length == 1) {

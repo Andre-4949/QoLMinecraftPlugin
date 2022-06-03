@@ -10,10 +10,6 @@ public class PluginController {
         this.main = main;
     }
 
-    public void onEnable(){
-        this.listenerController = new ListenerController(this);
-    }
-
     public Main getMain() {
         return main;
     }
@@ -25,6 +21,8 @@ public class PluginController {
     public void setConfig(ConfigController config){
         this.config = config;
         config.onEnable();
+        this.listenerController = new ListenerController(this);
+        listenerController.onEnable();
     }
 
     public ListenerController getListenerController() {

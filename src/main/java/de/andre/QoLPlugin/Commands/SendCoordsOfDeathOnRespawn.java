@@ -27,21 +27,19 @@ public class SendCoordsOfDeathOnRespawn implements TabCompleter, CommandExecutor
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!sender.isOp())return true;
         if(args.length<1){
-            Util.smartSendMessage(controller, sender, "The value is now set to: " + controller.getConfig().getSendCoordsOfDeathOnRespawn());
+            Util.smartSendMessage(controller, sender, "The value is now set to: " + controller.getConfig().isSendCoordsOfDeathOnRespawn());
             return true;
         }
-        switch (args[0]){
-            case TRUE:
+        switch (args[0]) {
+            case TRUE -> {
                 controller.getConfig().setSendCoordsOfDeathOnRespawn(true);
                 Util.smartSendMessage(controller, sender, "The value is now set to: " + true);
-                break;
-            case FALSE:
+            }
+            case FALSE -> {
                 controller.getConfig().setSendCoordsOfDeathOnRespawn(false);
                 Util.smartSendMessage(controller, sender, "The value is now set to: " + false);
-                break;
-            case HELP:
-                Util.smartSendMessage(controller,sender,"This feature enables/disables the sending of the deathlocation's coords after respawn.");
-                break;
+            }
+            case HELP -> Util.smartSendMessage(controller, sender, "This feature enables/disables the sending of the deathlocation's coords after respawn.");
         }
         return true;
     }

@@ -13,12 +13,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Objects;
 
 public class Main extends JavaPlugin {
+    //TODO add documentation in minecraft (maybe in written book from mcstacker)
     private final PluginController controller = new PluginController(this);
 
     @Override
     public void onEnable() {
         controller.setConfig(new ConfigController(controller));
-        controller.onEnable();
         controller.getConfig().onEnable();
         registerCommands();
     }
@@ -36,6 +36,7 @@ public class Main extends JavaPlugin {
         registerCommand("bp", new ToolBreakPreventionCommand(controller));
         registerCommand("vineMiner", new VineMinerCommand(controller));
         registerCommand("vm", new VineMinerCommand(controller));
+        registerCommand("villagerselect", new VillagerSelect(controller));
     }
 
     private void registerCommand(String s, Object e){

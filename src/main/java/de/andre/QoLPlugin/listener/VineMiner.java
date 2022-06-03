@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 public class VineMiner implements QoLListener {
     private final PluginController controller;
-    public static int MAXVINEBLOCKS = 512;
     private ArrayList<Player> activeVineMiner = new ArrayList<>();
 
     public VineMiner(PluginController controller) {
@@ -31,6 +30,7 @@ public class VineMiner implements QoLListener {
     @EventHandler
     public void onMine(BlockBreakEvent event) {
         if (event.isCancelled()) return;
+        if (controller.getConfig().isNotVineMinerEnabled())return;
 
         Player p = event.getPlayer();
         ItemStack i = p.getInventory().getItemInMainHand();
@@ -65,10 +65,10 @@ public class VineMiner implements QoLListener {
 
             if (durability>0) {//only applies if player item with tool
 
-                int maxMineableBlocks = ToolBreakPrevention.isProtected(i) ? durability - 2 : durability;
+                int maxMineableBlocks = ToolBreakPrevention.isProtected(i, controller) ? durability - 2 : durability;
                 //limit the blocks, so we don't get negative durability later on
                 if (maxMineableBlocks <= 0) return;
-                blocks = blocks.stream().limit(VineMiner.MAXVINEBLOCKS).limit(maxMineableBlocks).collect(Collectors.toCollection(ArrayList::new));
+                blocks = blocks.stream().limit(controller.getConfig().getVineMinerMaxBlocks()).limit(maxMineableBlocks).collect(Collectors.toCollection(ArrayList::new));
                 //call event so ToolBreakPrevention is called
 //                    controller.getMain().getServer().getPluginManager().callEvent(new PlayerItemDamageEvent(p, i, 1, 1));
 
@@ -103,20 +103,22 @@ public class VineMiner implements QoLListener {
 
 
     public ArrayList<Block> getConnectingBlocks(Block b){
-        ArrayList<Block> vineBlocks = new ArrayList<Block>(){{add(b);}};
+        ArrayList<Block> vineBlocks = new ArrayList<>() {{
+            add(b);
+        }};
         int lastAmount;
 
         do {
             HashSet<Block> newVineBlocks = new HashSet<>();
             lastAmount = vineBlocks.size();
             for (Block vineBlock : vineBlocks) {
-                newVineBlocks.addAll(Util.getNeighbouringBlocks(vineBlock).stream().filter(x -> x.getType().equals(b.getType())).collect(Collectors.toList()));
+                newVineBlocks.addAll(Util.getCubeOfBlocksAroundBlock(vineBlock).stream().filter(x -> x.getType().equals(b.getType())).collect(Collectors.toList()));
             }
             vineBlocks.addAll(newVineBlocks);
             Set<Block> vineSet = new HashSet<>(vineBlocks);
             vineBlocks.clear();
             vineBlocks.addAll(vineSet);
-        } while ((vineBlocks.size() < MAXVINEBLOCKS && vineBlocks.size() != lastAmount));//when the same size, we don't make progress so let's just stop gathering blocks
+        } while ((vineBlocks.size() < controller.getConfig().getVineMinerMaxBlocks() && vineBlocks.size() != lastAmount));//when the same size, we don't make progress so let's just stop gathering blocks
         return vineBlocks;
     }
 

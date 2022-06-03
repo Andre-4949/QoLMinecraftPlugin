@@ -21,9 +21,8 @@ public class Ping implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) return true;
-        Player p = ((Player) sender);
-        p.sendMessage(controller.getConfig().getMessages().getSERVERPREFIX() + "ping: " + p.getPing() + "ms");
+        if (!(sender instanceof Player p)) return true;
+        p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "ping: " + p.getPing() + "ms");
         return true;
     }
 

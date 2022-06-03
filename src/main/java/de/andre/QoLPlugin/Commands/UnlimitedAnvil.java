@@ -27,21 +27,19 @@ public class UnlimitedAnvil implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!sender.isOp())return true;
         if(args.length<1){
-            Util.smartSendMessage(controller, sender, "The value is now set to: " + controller.getConfig().getUnlimitedCost());
+            Util.smartSendMessage(controller, sender, "The value is now set to: " + controller.getConfig().isUnlimitedCost());
             return true;
         }
-        switch (args[0]){
-            case TRUE:
+        switch (args[0]) {
+            case TRUE -> {
                 controller.getConfig().setUnlimitedCost(true);
                 Util.smartSendMessage(controller, sender, "The value is now set to: " + true);
-                break;
-            case FALSE:
+            }
+            case FALSE -> {
                 controller.getConfig().setUnlimitedCost(false);
                 Util.smartSendMessage(controller, sender, "The value is now set to: " + false);
-                break;
-            case HELP:
-                Util.smartSendMessage(controller,sender,"This command enables/disables the 'too expensive'-function while combining items which have more anvil uses. (the text in the anvil still remains)");
-                break;
+            }
+            case HELP -> Util.smartSendMessage(controller, sender, "This command enables/disables the 'too expensive'-function while combining items which have more anvil uses. (the text in the anvil still remains)");
         }
         return true;
     }

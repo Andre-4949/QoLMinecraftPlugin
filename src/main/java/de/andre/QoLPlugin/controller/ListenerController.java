@@ -12,13 +12,19 @@ public class ListenerController {
 
     public ListenerController(PluginController controller) {
         this.controller = controller;
+    }
+
+    public void onEnable(){
         listeners.add(new FarmingListener(controller));
         listeners.add(new DispenserListener(controller));
         listeners.add(new PlayerListener(controller));
-        listeners.add(new AnvilListener(controller));
+        if (controller.getConfig().isUnlimitedCost())
+            listeners.add(new AnvilListener(controller));
         listeners.add(new VineMiner(controller));
-        listeners.add(new FastLeafDecay(controller));
-        listeners.add(new ToolBreakPrevention(controller));
+        if (controller.getConfig().isFastLeafDecayEnabled())
+            listeners.add(new FastLeafDecay(controller));
+        if (controller.getConfig().isToolBreakPreventionEnabled())
+            listeners.add(new ToolBreakPrevention(controller));
         registerListener();
     }
 

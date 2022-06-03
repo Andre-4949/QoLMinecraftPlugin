@@ -27,7 +27,7 @@ public class FarmingListener implements QoLListener {
 
     @EventHandler
     public void onHarvest(PlayerInteractEvent event) {
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking()) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking() || !controller.getConfig().isSimpleHarvestEnabled()) return;
 
         List<Material> seeds = controller.getConfig().getSimpleHarvestMaterials();
 
@@ -58,7 +58,7 @@ public class FarmingListener implements QoLListener {
 
     @EventHandler
     public void onRightClickOnComposter(PlayerInteractEvent event) {
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || Objects.requireNonNull(event.getClickedBlock()).getType() != Material.COMPOSTER)
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || Objects.requireNonNull(event.getClickedBlock()).getType() != Material.COMPOSTER || controller.getConfig().isNotAdvancedCompostEnabled())
             return;
 
         Block block = event.getClickedBlock();
@@ -99,6 +99,7 @@ public class FarmingListener implements QoLListener {
     public void onHopperEvent(InventoryMoveItemEvent event) {
         if (!event.getDestination().getType().equals(InventoryType.COMPOSTER) ||
                 !event.getSource().getType().equals(InventoryType.HOPPER) ||
+                controller.getConfig().isNotAdvancedCompostEnabled() ||
                 (event.getDestination().getLocation() != null &&
                         event.getSource().getLocation() != null) ||
                 !controller.getConfig().getAdvancedCompostMaterials().contains(event.getItem().getType())

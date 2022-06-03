@@ -1,14 +1,22 @@
 simpleHarvest:
-  materials:
-    - BEETROOTS
-    - WHEAT
-    - CARROTS
-    - POTATOES
+  materials: []
+  activated: false
 advancedCompost:
-  materials:
-    - ROTTEN_FLESH
-    - COPPER_ORE
-vineminer:
-  materials:
-    - STONE
-    -
+  materials: []
+  activated: false
+mutedPlayers:
+  players: []
+  activated: false
+privateMessageViewing:
+  admins: []
+  activated: false
+SendCoordsOfDeathOnRespawn: false
+SendMessageOnGamemodeChange: false
+UnlimitedAnvil: false
+villagerSelect:
+  activated: true
+  cooldown: 1
+  maxRetries: 700
+CtrlQCraft: false
+FastLeafDecay: false
+ToolBreakPrevention: false

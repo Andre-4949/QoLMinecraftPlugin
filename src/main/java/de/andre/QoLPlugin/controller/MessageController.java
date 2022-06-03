@@ -9,12 +9,12 @@ public class MessageController {
     private final String PLUGINPREFIX = "[QoLPlugin] ";
     private final String SERVERPREFIX = ChatColor.RED + "[QoLPlugin]" + ChatColor.RESET + " ";
     private final String ERRORADDMATERIAL = SERVERPREFIX + "There was an Error. Either the Material doesn't exist or it was spelled wrong.";
-    private final String MATERIALADDEDSUCCESS = SERVERPREFIX + " Material added successfully.";
-    private final String MATERIALREMOVEDSUCCESS = SERVERPREFIX + " Material removed successfully.";
-    private final String SAVECONFIGCONSOLE = PLUGINPREFIX + " The Config was saved.";
-    private final String SAVECONFIGINGAME = SERVERPREFIX + " The Config was saved.";
+    private final String MATERIALADDEDSUCCESS = SERVERPREFIX + "Material added successfully.";
+    private final String MATERIALREMOVEDSUCCESS = SERVERPREFIX + "Material removed successfully.";
+    private final String SAVECONFIGCONSOLE = PLUGINPREFIX + "The Config was saved.";
+    private final String SAVECONFIGINGAME = SERVERPREFIX + "The Config was saved.";
     private final String GENERALERRORMESSAGE = SERVERPREFIX + "What the fork happened here? O.o";
-    private final String PRIVATEMESSAGEFROMONEPLAYERTOANOTHER = SERVERPREFIX+ "%s texted %s: %s";
+    private final String PRIVATEMESSAGEFROMONEPLAYERTOANOTHER = SERVERPREFIX + "%s texted %s: %s";
     /*
      Getter
      */

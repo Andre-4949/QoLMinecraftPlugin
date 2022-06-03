@@ -24,8 +24,9 @@ public class VineMinerCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player))return true;
-        Player p = (Player) sender;
+        if (!(sender instanceof Player p))return true;
+        if (controller.getConfig().isNotVineMinerEnabled())return true;
+
         VineMiner vm = (VineMiner) controller.getListenerController().getListener(VineMiner.class);
         if (args[0].equals("on")){
             vm.addPlayerToActiveVineMiner(p);
