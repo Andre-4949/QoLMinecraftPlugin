@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 
 public class Util {
-    Util(){}
+    public static PluginController controller;
 
     public static void sendMessageToAdmins(PluginController controller,Object o){
         Bukkit.getOnlinePlayers().stream().filter(ServerOperator::isOp).forEach(x->x.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX()+o.toString()));

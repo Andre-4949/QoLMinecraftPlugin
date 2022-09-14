@@ -18,6 +18,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Util.controller = controller;
         controller.setConfig(new ConfigController(controller));
         controller.getConfig().onEnable();
         registerCommands();
@@ -37,6 +38,7 @@ public class Main extends JavaPlugin {
         registerCommand("vineMiner", new VineMinerCommand(controller));
         registerCommand("vm", new VineMinerCommand(controller));
         registerCommand("villagerselect", new VillagerSelect(controller));
+        registerCommand("seePrivateMessages", new SeePrivateMessages(controller));
     }
 
     private void registerCommand(String s, Object e){
@@ -54,5 +56,4 @@ public class Main extends JavaPlugin {
         controller.getConfig().saveConfig();
         Bukkit.getWorlds().forEach(World::save);
     }
-
 }

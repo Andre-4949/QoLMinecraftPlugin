@@ -1,7 +1,7 @@
 package de.andre.QoLPlugin.Commands;
 
 import de.andre.QoLPlugin.controller.PluginController;
-import de.andre.QoLPlugin.listener.VineMiner;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,34 +11,31 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class VineMinerCommand implements CommandExecutor, TabCompleter {
+public class SeePrivateMessages implements CommandExecutor, TabCompleter {
     private final PluginController controller;
-    private static final ArrayList<String> OPTIONS = new ArrayList<>(Arrays.asList("on", "off"));
 
-    public VineMinerCommand(PluginController controller) {
+    public SeePrivateMessages(PluginController controller) {
         this.controller = controller;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player p))return true;
-        if (controller.getConfig().isNotVineMinerEnabled())return true;
-
-        if (args[0].equals("on")){
-            VineMiner.activeVineMiner.add(p);
-        } else if (args[0].equals("off")){
-            VineMiner.activeVineMiner.remove(p);
+        if (!p.isOp())return true;
+        if (controller.getConfig().getAdminsWhichEnabledPrivateMessageViewing().contains(p)){
+            controller.getConfig().removeAdminsWhichEnabledPrivateMessageViewing(p);
+            p.sendMessage(Component.text(controller.getConfig().getMessageController().getSERVERPREFIX() + "Private message viewing disabled"));
+        } else {
+            controller.getConfig().addAdminsWhichEnabledPrivateMessageViewing(p);
+            p.sendMessage(Component.text(controller.getConfig().getMessageController().getSERVERPREFIX() + "Private message viewing enabled"));
         }
-
         return true;
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length==1) return OPTIONS;
         return new ArrayList<>();
     }
 }

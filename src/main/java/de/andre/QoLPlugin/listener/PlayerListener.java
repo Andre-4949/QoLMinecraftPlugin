@@ -26,13 +26,17 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PlayerListener implements QoLListener {
     private final PluginController controller;
+    private static final ArrayList<String> messageCommands = new ArrayList<>() {{
+        add("msg");
+        add("w");
+        add("tell");
+    }};
 
     public PlayerListener(PluginController controller) {
         this.controller = controller;
@@ -42,13 +46,21 @@ public class PlayerListener implements QoLListener {
     public void onChat(AsyncChatEvent event) {
         if (controller.getConfig().getMutedPlayers().contains(event.getPlayer()) && event.viewers().containsAll(Bukkit.getOnlinePlayers()))
             event.setCancelled(true);
+    }
 
-        if (event.viewers().size() < Bukkit.getOnlinePlayers().size()) {
-            Bukkit.getOnlinePlayers().stream().filter(ServerOperator::isOp).filter(x -> controller.getConfig().getAdminsWhichEnabledPrivateMessageViewing().contains(x)).forEach(x -> x.sendMessage(controller.getConfig().getMessageController().getPRIVATEMESSAGEFROMONEPLAYERTOANOTHER(
-                    event.getPlayer(),
-                    new ArrayList<>(event.viewers().stream().map(y -> (Player) y).collect(Collectors.toList())),
-                    event.message().toString())));
-        }
+    @EventHandler
+    public void onPreCommand(PlayerCommandPreprocessEvent event) {
+        String cmd = event.getMessage().split(" ")[0].replace("/", "");
+        if (!messageCommands.contains(cmd)) return;
+        String[] commandSections = event.getMessage().split(" ", 3);
+        if (commandSections.length > 2)
+            Bukkit.getOnlinePlayers().stream()
+                    .filter(ServerOperator::isOp)
+                    .filter(x -> controller.getConfig().getAdminsWhichEnabledPrivateMessageViewing().contains(x))
+                    .forEach(x -> x.sendMessage(controller.getConfig().getMessageController().getPRIVATEMESSAGEFROMONEPLAYERTOANOTHER(
+                            event.getPlayer(),
+                            event.getMessage().split(" ")[1],
+                            commandSections[2])));
     }
 
     @EventHandler
@@ -66,17 +78,30 @@ public class PlayerListener implements QoLListener {
 
     @EventHandler
     public void onPlayerDied(PlayerDeathEvent event) {
-        Location loc = event.getEntity().getLocation();
-        Block locBlock = loc.getWorld().getBlockAt(loc);
-        Collection<ItemStack> drops = locBlock.getDrops();
-        locBlock.setType(Material.CHEST);
-        Chest chest = (Chest) locBlock.getState();
-        chest.getBlockInventory().setContents(event.getDrops().toArray(new ItemStack[0]));
-        for (ItemStack drop : drops) {
-            chest.getBlockInventory().addItem(drop);
+        Location loc = event.getEntity().getWorld().getHighestBlockAt(event.getEntity().getLocation()).getLocation();
+        if (event.getEntity().getWorld().getEnvironment().equals(World.Environment.NETHER) && loc.getY() > 128) {
+            for (int i = 128; i > 0; i--) {
+                loc.setY(i);
+                if (loc.getBlock().isSolid()) {
+                    loc.add(0, 1, 0);
+                    break;
+                }
+            }
         }
+        ArrayList<ItemStack> remainingItems = new ArrayList<>();
+
+        do {
+            Block locBlock = loc.add(0, 1, 0).getBlock();
+            locBlock.setType(Material.CHEST);
+            Chest chest = (Chest) locBlock.getState();
+            ArrayList<ItemStack> drops = new ArrayList<>(event.getDrops());
+            for (ItemStack drop : drops) {
+                remainingItems.addAll(chest.getBlockInventory().addItem(drop).values());
+            }
+        } while (remainingItems.size()>0);
+
         event.getDrops().forEach(x -> x.setType(Material.AIR));
-        Player p = event.getEntity();
+        Player p = event.getPlayer();
         controller.getConfig().addPlayerToDeadPlayers(p, loc);
     }
 
@@ -129,18 +154,18 @@ public class PlayerListener implements QoLListener {
             ingredientList = new ArrayList<>(shapedRecipe.getIngredientMap().values());
             choiceLength = shapedRecipe.getChoiceMap().values().size();
         } else {
-            p.sendMessage("oops something went wrong");
+            p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "oops something went wrong");
             return;//if some other recipe event has been triggered; I haven't tested it but maybe in the future they might trigger this event
         }
 
         if (choiceLength != 1) //This was a pain in the a..
             /*
-             * lets start by just trying to craft sticks, the ingredientList will contain oak planks even
+             * let's start by just trying to craft sticks, the ingredientList will contain oak planks even
              * if you try to craft the sticks with spruce planks, that's why the ingredientList has to be corrected
              * to contain the same material as the crafting matrix.
              *
              * I implemented a method called iterateParallel to iterate through two iterator objects at the same time,
-             * because the slots mustn't get messed up. I tried with brewing stands and cobblestone, blackstone and it
+             * because the slots mustn't get messed up. I tried with brewing stands and cobblestone, blackstone, and it
              * didn't work like I intended it to work
              * */
             Util.iterateParallel(
@@ -159,7 +184,7 @@ public class PlayerListener implements QoLListener {
         if (correctedIngredientList.size() == 0)
             correctedIngredientList.addAll(ingredientList);// if there is just one choice lets fill the list with the ingredientList
         ArrayList<ItemStack> ingredientRatio = Util.simplifyItemStackList(correctedIngredientList);
-        p.sendMessage("CtrlQCrafting...");
+        p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "CtrlQCrafting...");
 
 
         int totalAmountOfItemsCrafted = 0;
@@ -182,7 +207,7 @@ public class PlayerListener implements QoLListener {
                  amountOfResults++) {
                 ItemStack[] contents = Util.removeItems(p.getInventory().getContents(), ingredientRatio);
 
-                if (p.getInventory().getContents() == contents) { //this should never happen but lets be safe
+                if (p.getInventory().getContents() == contents) { //this should never happen but let's be safe
                     break;
                 }
                 p.getInventory().setContents(contents);
@@ -228,7 +253,20 @@ public class PlayerListener implements QoLListener {
             } else {
                 p.getInventory().setItemInMainHand(new ItemStack(Material.TOTEM_OF_UNDYING));
             }
-            p.sendMessage("A new Totem from your Inventory was placed in your hand.");
+            p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "A new Totem from your Inventory was placed in your hand.");
+            return;
+        }
+
+        if (p.getEnderChest().contains(Material.TOTEM_OF_UNDYING) && p.getEnderChest().containsAtLeast(new ItemStack(Material.TOTEM_OF_UNDYING), 2)) {
+            ItemStack[] contents = p.getEnderChest().getContents();
+            p.getEnderChest().setContents(Util.removeAmount(contents, Material.TOTEM_OF_UNDYING, 2));
+            p.updateInventory();
+            if (p.getInventory().getItemInOffHand().equals(item)) {
+                p.getInventory().setItemInOffHand(new ItemStack(Material.TOTEM_OF_UNDYING));
+            } else {
+                p.getInventory().setItemInMainHand(new ItemStack(Material.TOTEM_OF_UNDYING));
+            }
+            p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "A new Totem from your Enderchest was placed in your hand.");
             return;
         }
 
@@ -249,7 +287,8 @@ public class PlayerListener implements QoLListener {
                         Material.BLUE_SHULKER_BOX,
                         Material.BROWN_SHULKER_BOX,
                         Material.GREEN_SHULKER_BOX,
-                        Material.RED_SHULKER_BOX
+                        Material.RED_SHULKER_BOX,
+                        Material.BLACK_SHULKER_BOX
                 )
         );
 
@@ -284,9 +323,7 @@ public class PlayerListener implements QoLListener {
 
                     shulkerboxMeta.setBlockState(shulkerBox);
                     shulkerbox.setItemMeta(shulkerboxMeta);
-
-                    Bukkit.getLogger().info(Arrays.toString(shulkerBox.getInventory().getContents()));
-
+                    p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "A Totem from one of your shulkerboxes was placed in your hand, because you used the one you hand.");
                     if (p.getInventory().getItemInOffHand().equals(item))
                         p.getInventory().setItemInOffHand(new ItemStack(Material.TOTEM_OF_UNDYING));
                     else
@@ -416,7 +453,6 @@ public class PlayerListener implements QoLListener {
                         p.setSaturation(p.getSaturation() + 12f);
                     }
                     case COOKED_PORKCHOP, COOKED_BEEF -> {
-                        Bukkit.getLogger().info(String.valueOf(itemStack.getAmount()));
                         p.setFoodLevel(p.getFoodLevel() + 8);
                         p.setSaturation(p.getSaturation() + 12.8f);
                     }

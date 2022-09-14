@@ -23,6 +23,7 @@ public class PluginController {
         config.onEnable();
         this.listenerController = new ListenerController(this);
         listenerController.onEnable();
+        EnchantmentController.registerLocalEnchantments(listenerController);
     }
 
     public ListenerController getListenerController() {

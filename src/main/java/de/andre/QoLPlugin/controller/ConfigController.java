@@ -50,7 +50,7 @@ public class ConfigController {
 
     private boolean sendCoordsOfDeathOnRespawn = false;
 
-    private boolean villagerSelectEnabled = true;
+    private boolean villagerSelectEnabled = false;
     private int villagerSelectCooldown = 1;
     private int villagerSelectMaxRetries = 700;
 
@@ -75,7 +75,6 @@ public class ConfigController {
 
         config = new File(controller.getMain().getDataFolder(), ConfigPaths.configFileName);
         ymlConfig = YamlConfiguration.loadConfiguration(config);
-
     }
 
     public void onEnable() {

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class VineMiner implements QoLListener {
     private final PluginController controller;
-    private ArrayList<Player> activeVineMiner = new ArrayList<>();
+    public static ArrayList<Player> activeVineMiner = new ArrayList<>();
 
     public VineMiner(PluginController controller) {
         this.controller = controller;
@@ -34,6 +34,7 @@ public class VineMiner implements QoLListener {
 
         Player p = event.getPlayer();
         ItemStack i = p.getInventory().getItemInMainHand();
+        ItemStack tool = p.getInventory().getItemInMainHand().clone();
         Block targetBlock = event.getBlock();
         if (!(p.isSneaking() && activeVineMiner.contains(p))) return;
 
@@ -44,7 +45,6 @@ public class VineMiner implements QoLListener {
 
         //just for performance
         HashMap<Material, Integer> totaldrops = new HashMap<>();
-        ArrayList<ItemStack> totalDrops = new ArrayList<>();
         AtomicInteger xp = new AtomicInteger();
 
         Bukkit.getScheduler().runTask(controller.getMain(), () -> {
@@ -79,14 +79,14 @@ public class VineMiner implements QoLListener {
                 durability = i.getType().getMaxDurability() - damageable.getDamage();
                 if (durability <= 0) {
                     i.setType(Material.AIR);
-                    p.sendMessage("removed Item from u");
                 }
                 p.getInventory().setItemInMainHand(i);
                 p.updateInventory();
 
             }
+
             blocks.forEach(x -> {
-                x.getDrops(i, p).forEach(y ->
+                x.getDrops(tool, p).forEach(y ->
                         totaldrops.put(y.getType(), totaldrops.getOrDefault(y.getType(), 0) + y.getAmount())
                 );
                 xp.addAndGet(new BlockBreakEvent(x, p).getExpToDrop());//as long as I don't call this event I'm fine :)... hopefully

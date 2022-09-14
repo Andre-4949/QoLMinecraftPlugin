@@ -33,12 +33,12 @@ public class ToolBreakPreventionCommand implements CommandExecutor, TabCompleter
             sender.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "You have to have a tool/armor in your hand to use this command.");
             return true;
         }
-        if (player.getInventory().getItemInMainHand().getType().equals(Material.ENCHANTED_BOOK)) {
-            Util.executeCommand(String.format(COMMAND, Util.componentToString(player.displayName())));
-            return true;
-        }
         if (!player.getInventory().getItemInMainHand().getItemMeta().hasEnchant(Enchantment.MENDING)) {
             sender.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "Your item doesn't have mending, please apply mending and execute the Command again.");
+            return true;
+        }
+        if (player.getInventory().getItemInMainHand().getType().equals(Material.ENCHANTED_BOOK)) {
+            Util.executeCommand(String.format(COMMAND, Util.componentToString(player.displayName())));
             return true;
         }
 

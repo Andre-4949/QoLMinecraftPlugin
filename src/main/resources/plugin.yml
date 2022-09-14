@@ -1,7 +1,7 @@
   name: QoLPlugin
   main: de.andre.QoLPlugin.Main
   version: 0.01-ALPHA
-  api-version: 1.17
+  api-version: 1.19
   author: Andre-4949
   commands:
     qol:
@@ -38,3 +38,6 @@
     villagerselect:
       description:
         let's you choose the enchantments of your villagers instead of standing there for hours not getting what you wanted
+    seePrivateMessages:
+      description:
+        allows you to see private messages between players

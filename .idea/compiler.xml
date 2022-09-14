@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="QoLMinecraftPlugin" target="16" />
+      <module name="QoLMinecraftPlugin" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

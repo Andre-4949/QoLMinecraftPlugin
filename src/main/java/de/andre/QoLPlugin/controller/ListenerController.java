@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class ListenerController {
     private final PluginController controller;
 
-    private final ArrayList<QoLListener> listeners = new ArrayList<>();
+    private ArrayList<QoLListener> listeners = new ArrayList<>();
 
     public ListenerController(PluginController controller) {
         this.controller = controller;
@@ -25,12 +25,18 @@ public class ListenerController {
             listeners.add(new FastLeafDecay(controller));
         if (controller.getConfig().isToolBreakPreventionEnabled())
             listeners.add(new ToolBreakPrevention(controller));
+        listeners.add(new NetherPortalListener(controller));
         registerListener();
     }
 
     private void registerListener(){
         HandlerList.unregisterAll(controller.getMain());
         listeners.forEach(listener->controller.getMain().getServer().getPluginManager().registerEvents(listener, controller.getMain()));
+    }
+
+    public void addListener(QoLListener listener){
+        this.listeners.add(listener);
+        controller.getMain().getServer().getPluginManager().registerEvents(listener,controller.getMain());
     }
 
     public QoLListener getListener(Class<? extends QoLListener> c){

@@ -3,8 +3,6 @@ package de.andre.QoLPlugin.controller;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-
 public class MessageController {
     private final String PLUGINPREFIX = "[QoLPlugin] ";
     private final String SERVERPREFIX = ChatColor.RED + "[QoLPlugin]" + ChatColor.RESET + " ";
@@ -49,7 +47,7 @@ public class MessageController {
 
     public String getGENERALERROR(){return GENERALERRORMESSAGE;}
 
-    public String getPRIVATEMESSAGEFROMONEPLAYERTOANOTHER(Player sender, ArrayList<Player> reciever, String msg){
-        return String.format(PRIVATEMESSAGEFROMONEPLAYERTOANOTHER, sender.getName(),reciever.toString().replace("[","").replace("]","").replace("  "," "),msg);
+    public String getPRIVATEMESSAGEFROMONEPLAYERTOANOTHER(Player sender, String reciever, String msg){
+        return String.format(PRIVATEMESSAGEFROMONEPLAYERTOANOTHER, sender.getName(),reciever,msg);
     }
 }

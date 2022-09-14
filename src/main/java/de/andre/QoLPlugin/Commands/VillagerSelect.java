@@ -1,5 +1,6 @@
 package de.andre.QoLPlugin.Commands;
 
+import de.andre.QoLPlugin.controller.ConfigController;
 import de.andre.QoLPlugin.controller.PluginController;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -56,7 +57,10 @@ public class VillagerSelect implements CommandExecutor, TabCompleter {
                     return true;
                 }
             }
-            if (enchantment.equals(Enchantment.SOUL_SPEED)) return true;
+            if (enchantment.equals(Enchantment.SOUL_SPEED)) {
+                p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "sneaky but still not allowed.");
+                return true;
+            }
             itemMeta.addEnchant(enchantment, level, false);
             item.setItemMeta(itemMeta);
         } else {
@@ -79,9 +83,11 @@ public class VillagerSelect implements CommandExecutor, TabCompleter {
 
         if (v.getProfession().equals(Villager.Profession.NONE) || v.getProfession().equals(Villager.Profession.NITWIT)) {
             p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "The villager needs to have a profession");
+            return true;
         }
         if (v.getVillagerExperience() != 0) {
             p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "The villager is not allowed to have any experience in his profession.");
+            return true;
         }
         p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "Modifying started");
         modifyVillager(v, item, controller.getConfig().getVillagerSelectMaxRetries());
@@ -93,7 +99,12 @@ public class VillagerSelect implements CommandExecutor, TabCompleter {
         if (!(sender instanceof Player p)) return new ArrayList<>();
         Villager.Profession v = Villager.Profession.NONE;
         if (args.length > 1) {
-            UUID uuid = UUID.fromString(args[0]);
+            UUID uuid;
+            try{
+                uuid = UUID.fromString(args[0]);
+            }catch (IllegalArgumentException e){
+                return new ArrayList<>(){{add(controller.getConfig().getMessageController().getSERVERPREFIX() + "The given uuid is invalid");}};
+            }
             List<Entity> entities = p.getNearbyEntities(5, 5, 5).stream().filter(x -> x.getUniqueId().equals(uuid)).collect(Collectors.toList());
             if (entities.size() == 0) {
                 p.sendMessage(controller.getConfig().getMessageController().getSERVERPREFIX() + "Entity not found, please be near your desired entity.");
@@ -105,7 +116,7 @@ public class VillagerSelect implements CommandExecutor, TabCompleter {
                 return new ArrayList<>();
             }
             if (args.length == 2)
-                ((Villager) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 3 * 20, 1));
+                ((Villager) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 3 * ConfigController.SECONDSTOTICKS, 1));
             v = ((Villager) entity).getProfession();
         }
         switch (args.length) {
